@@ -12,6 +12,15 @@ const CHART_BODIES = [
   "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto", "Chiron",
 ];
 
+// 어스펙트(행성 간 각) 정의 — 5대 메이저 전부 표시. color로 차트 중앙 선이 그려진다.
+const ASPECTS = {
+  conjunction: { degree: 0, orbit: 8, color: "#d4a017" }, // 합 (금)
+  sextile: { degree: 60, orbit: 6, color: "#27ae60" },    // 육각 (녹)
+  square: { degree: 90, orbit: 8, color: "#ff4500" },     // 사각 (적)
+  trine: { degree: 120, orbit: 8, color: "#2e86c1" },     // 삼각 (청)
+  opposition: { degree: 180, orbit: 10, color: "#8e44ad" }, // 대 (보라)
+};
+
 export async function renderNatalChartPng(chart: NatalChart, size = 1080): Promise<Buffer> {
   // astrochart는 DOM/SVG에 의존 → jsdom으로 전역 제공.
   const dom = new JSDOM(`<!DOCTYPE html><body><div id="paper"></div></body>`, {
@@ -25,6 +34,7 @@ export async function renderNatalChartPng(chart: NatalChart, size = 1080): Promi
 
   const astro = require("@astrodraw/astrochart");
   const Chart = astro.Chart;
+  const AspectCalculator = astro.AspectCalculator;
 
   const planets: Record<string, number[]> = {};
   for (const p of chart.planets) {
@@ -34,8 +44,12 @@ export async function renderNatalChartPng(chart: NatalChart, size = 1080): Promi
     }
   }
 
-  const c = new Chart("paper", size, size);
-  c.radix({ planets, cusps: chart.cusps });
+  const c = new Chart("paper", size, size, { ASPECTS });
+  const radix = c.radix({ planets, cusps: chart.cusps });
+
+  // 어스펙트 선을 차트 중앙에 그린다(행성 간 각).
+  const aspects = new AspectCalculator(planets, { ASPECTS }).radix(planets);
+  radix.aspects(aspects);
 
   const paper = dom.window.document.getElementById("paper");
   const svgEl = paper ? paper.querySelector("svg") : null;
