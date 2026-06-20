@@ -16,9 +16,15 @@
   },
   "keywords": [
     "mcp",
+    "model-context-protocol",
+    "hermes-agent",
+    "claude",
+    "vibe-coding",
+    "korean",
+    "telegram",
+    "fortune-telling",
     "astrology",
-    "natal-chart",
-    "model-context-protocol"
+    "natal-chart"
   ],
   "license": "MIT",
   "engines": {
